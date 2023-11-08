@@ -1,11 +1,11 @@
 #include "Graphe.h"
 #include "file.h"
 void afficher_successeurs(pSommet* sommet, int num) {
-    printf("Sommet %d:\n", num);
+    printf("Sommet %s:\n", sommet[num]->nom);
     pArc arc = sommet[num]->arc;
 
     while (arc != NULL) {
-        printf("Vers sommet %d avec capacite %d\n", arc->sommet, arc->capacite);
+        printf("Vers sommet %s avec capacite %d\n", sommet[arc->sommet]->nom, arc->capacite);
         arc = arc->arc_suivant;
     }
 }
@@ -63,14 +63,18 @@ Graphe* lire_graphe(char* nomFichier) {
     int ordre;
     fscanf(file, "%d", &ordre);
 
-    // Lire et ignorer les noms des sommets pour le moment
-    char temp[256];
-    for (int i = 0; i < ordre; ++i) {
-        fscanf(file, "%s", temp);
-    }
-
     Graphe* graphe = CreerGraphe(ordre);
 
+    ordre = graphe->ordre;
+
+
+    // Lire les noms des sommets
+    for (int i = 0; i < ordre; ++i) {
+        graphe->pSommet[i]->nom = (char*)malloc(sizeof(char));
+
+        fscanf(file, "%s", graphe->pSommet[i]->nom);
+
+    }
     int capacite;
     for (int i = 0; i < ordre; ++i) {
         for (int j = 0; j < ordre; ++j) {
@@ -88,9 +92,7 @@ Graphe* lire_graphe(char* nomFichier) {
 
 
 /*affichage du graphe avec les successeurs de chaque sommet */
-void graphe_afficher(Graphe* graphe)
-{
-    printf("\ngraphe ");
+void graphe_afficher(Graphe* graphe){
 
     printf("\nordre = %d\n",graphe->ordre);
 

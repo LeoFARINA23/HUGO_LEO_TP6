@@ -24,6 +24,7 @@ struct Sommet
 {
     struct Arc* arc;
     int valeur;
+    char* nom;
 };
 
 /* Alias de pointeur sur un Sommet */
