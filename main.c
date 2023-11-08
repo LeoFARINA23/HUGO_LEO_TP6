@@ -14,19 +14,14 @@ void afficher_successeurs(pSommet* sommet, int num) {
 pSommet* CreerArete(pSommet* sommet, int s1, int s2, int capacite) {
     // Allouer la mémoire pour le nouvel arc
     pArc Newarc = (pArc)malloc(sizeof(struct Arc));
-    if (Newarc == NULL) {
-        fprintf(stderr, "Erreur d'allocation mémoire pour l'arc.\n");
-        exit(EXIT_FAILURE);
-    }
-    Newarc->sommet = s2;
-    Newarc->capacite = capacite;  // Ajout de la capacité à la structure de l'arc
-    Newarc->arc_suivant = NULL;
 
-    // Si le sommet s1 n'a pas d'arc, lui ajouter directement le nouvel arc
+    Newarc->sommet = s2;
+    Newarc->capacite = capacite;
+    Newarc->arc_suivant = NULL;
     if (sommet[s1]->arc == NULL) {
         sommet[s1]->arc = Newarc;
     } else {
-        // Sinon, parcourir la liste des arcs de s1 et ajouter le nouvel arc à la fin
+
         pArc temp = sommet[s1]->arc;
         while (temp->arc_suivant != NULL) {
             temp = temp->arc_suivant;
@@ -80,7 +75,7 @@ Graphe* lire_graphe(char* nomFichier) {
         for (int j = 0; j < ordre; ++j) {
             fscanf(file, "%d", &capacite);
             if (capacite > 0) {
-                // Ajouter une arête seulement si la capacité est supérieure à zéro
+
                 graphe->pSommet = CreerArete(graphe->pSommet, i, j, capacite);
             }
         }
