@@ -67,7 +67,6 @@ int file_vide(FIFO* f) {
 
 void BFS(Graphe* g, int sommet_init) { //déclaration de la fonction BFS
     int taille = g->ordre;
-    sommet_init -= val_init; // récupération de l'ordre du graphe
     int decouvert[taille];
     int pred[taille]; // Prédécesseurs de chaque sommet
 
@@ -95,14 +94,12 @@ void BFS(Graphe* g, int sommet_init) { //déclaration de la fonction BFS
             arc = arc->arc_suivant;
         }
     }
-    printf("%d\n", sommet_init + (g->orientation ? 2 : 0)); //on affiche les resultats du graphe tous en précisant si c'est un graphe orienté ou pas orienté
 
     for (int i = 0; i < taille; i++) {
         if (i != sommet_init && decouvert[i]) { // boucle pour remonter la chaine de tous les prédecesseurs du sommet_init jusqu-au sommet actuel
-            printf("%d", i + (g->orientation ? 2 : 0));
             int j = i;
             while (pred[j] != -1) {
-                printf(" <- %d", pred[j] + (g->orientation ? 2 : 0));
+                printf(" <- %d", pred[j] );
                 j = pred[j];
             }
             printf("\n");

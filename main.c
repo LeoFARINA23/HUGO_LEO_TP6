@@ -1,54 +1,42 @@
 #include "Graphe.h"
 #include "file.h"
-int val_init = 0;
-void afficher_successeurs(pSommet * sommet, int num)
-{
-    printf(" sommet %d :\n", num + val_init);
+void afficher_successeurs(pSommet* sommet, int num) {
+    printf("Sommet %d:\n", num);
     pArc arc = sommet[num]->arc;
 
-    while(arc != NULL)
-    {
-        printf("%d ", arc->sommet + val_init);
+    while (arc != NULL) {
+        printf("Vers sommet %d avec capacite %d\n", arc->sommet, arc->capacite);
         arc = arc->arc_suivant;
     }
 }
 
-pSommet* CreerArete(pSommet* sommet, int s1, int s2)
 
-{
-    if(sommet[s1]->arc==NULL)
-    {
-        pArc Newarc=(pArc)malloc(sizeof(struct Arc));
-        Newarc->sommet=s2;
-        Newarc->arc_suivant=NULL;
-        sommet[s1]->arc=Newarc;
-        return sommet;
+pSommet* CreerArete(pSommet* sommet, int s1, int s2, int capacite) {
+    // Allouer la mémoire pour le nouvel arc
+    pArc Newarc = (pArc)malloc(sizeof(struct Arc));
+    if (Newarc == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire pour l'arc.\n");
+        exit(EXIT_FAILURE);
+    }
+    Newarc->sommet = s2;
+    Newarc->capacite = capacite;  // Ajout de la capacité à la structure de l'arc
+    Newarc->arc_suivant = NULL;
+
+    // Si le sommet s1 n'a pas d'arc, lui ajouter directement le nouvel arc
+    if (sommet[s1]->arc == NULL) {
+        sommet[s1]->arc = Newarc;
+    } else {
+        // Sinon, parcourir la liste des arcs de s1 et ajouter le nouvel arc à la fin
+        pArc temp = sommet[s1]->arc;
+        while (temp->arc_suivant != NULL) {
+            temp = temp->arc_suivant;
+        }
+        temp->arc_suivant = Newarc;
     }
 
-    else
-    {
-        pArc temp=sommet[s1]->arc;
-        while( !(temp->arc_suivant==NULL))
-        {
-            temp=temp->arc_suivant;
-        }
-        pArc Newarc=(pArc)malloc(sizeof(struct Arc));
-        Newarc->sommet=s2;
-        Newarc->arc_suivant=NULL;
-
-        if(temp->sommet>s2)
-        {
-            Newarc->arc_suivant=temp->arc_suivant;
-            Newarc->sommet=temp->sommet;
-            temp->sommet=s2;
-            temp->arc_suivant=Newarc;
-            return sommet;
-        }
-
-        temp->arc_suivant=Newarc;
-        return sommet;
-    }
+    return sommet;
 }
+
 
 // créer le graphe
 Graphe* CreerGraphe(int ordre)
@@ -65,55 +53,44 @@ Graphe* CreerGraphe(int ordre)
     return Newgraphe;
 }
 
-Graphe * lire_graphe(char * nomFichier)
-{
-    Graphe* graphe;
-    FIFO * ifs = fopen(nomFichier, "r");
-    int taille, orientation, ordre, s1, s2;
-
-    if (!ifs)
-    {
-        printf("Erreur de lecture fichier\n");
+Graphe* lire_graphe(char* nomFichier) {
+    FILE *file = fopen(nomFichier, "r");
+    if (!file) {
+        printf("Erreur de lecture du fichier\n");
         exit(-1);
     }
 
-    fscanf(ifs, "%d", &ordre);
-    fscanf(ifs, "%d", &taille);
-    fscanf(ifs, "%d", &orientation);
+    int ordre;
+    fscanf(file, "%d", &ordre);
 
-    if (orientation == 1) // Si le graphe est orienté, on a met l'val_init à 2
-    {
-        val_init = 2;
+    // Lire et ignorer les noms des sommets pour le moment
+    char temp[256];
+    for (int i = 0; i < ordre; ++i) {
+        fscanf(file, "%s", temp);
     }
 
-    graphe = CreerGraphe(ordre);
-    graphe->orientation = orientation;
-    graphe->ordre = ordre;
+    Graphe* graphe = CreerGraphe(ordre);
 
-    for (int i = 0; i < taille; ++i)
-    {
-        fscanf(ifs, "%d%d", &s1, &s2);
-
-        s1 -= val_init;
-        s2 -= val_init;
-
-        graphe->pSommet = CreerArete(graphe->pSommet, s1, s2);
-        if (!orientation)
-            graphe->pSommet = CreerArete(graphe->pSommet, s2, s1);
+    int capacite;
+    for (int i = 0; i < ordre; ++i) {
+        for (int j = 0; j < ordre; ++j) {
+            fscanf(file, "%d", &capacite);
+            if (capacite > 0) {
+                // Ajouter une arête seulement si la capacité est supérieure à zéro
+                graphe->pSommet = CreerArete(graphe->pSommet, i, j, capacite);
+            }
+        }
     }
 
+    fclose(file);
     return graphe;
 }
+
 
 /*affichage du graphe avec les successeurs de chaque sommet */
 void graphe_afficher(Graphe* graphe)
 {
     printf("\ngraphe ");
-
-    if(graphe->orientation)
-        printf("oriente = 1\n");
-    else
-        printf("non oriente = 0\n");
 
     printf("\nordre = %d\n",graphe->ordre);
 
@@ -131,18 +108,15 @@ int main() {
     Graphe *g;
 
     char nom_fichier[50];
-    int sommetinit;
 
     printf("entrer le nom du fichier du labyrinthe:");
     gets(nom_fichier);
 
     g = lire_graphe(nom_fichier);
-    printf("numero du sommet initial : ");
-    scanf("%d", &sommetinit);
+
 
 
     graphe_afficher(g);
-    printf("\nBFS :\n");
-    BFS(g, sommetinit);
+
     return 0;
 }

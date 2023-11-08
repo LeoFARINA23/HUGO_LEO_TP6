@@ -6,6 +6,4 @@ set(CMAKE_C_STANDARD 99)
 add_executable(HUGO_LEO_TP6 main.c
         Graphe.h
         file.h
-        cmake-build-debug/cellule.c
-        cellule.cpp
         cellule.c)
