@@ -65,46 +65,56 @@ int file_vide(FIFO* f) {
 }
 
 
-void BFS(Graphe* g, int sommet_init) { //déclaration de la fonction BFS
+void BFS(Graphe* g, int sommet_init) {
     int taille = g->ordre;
     int decouvert[taille];
     int pred[taille]; // Prédécesseurs de chaque sommet
 
+    // Initialisation des tableaux decouvert et pred
     for (int i = 0; i < taille; i++) {
         decouvert[i] = 0;  // Aucun sommet n'est visité
-        pred[i] = -1;  // Prédécesseur de chaque sommet est initialisé à -1 pour être sur de commencer à 0
+        pred[i] = -1;  // Prédécesseur de chaque sommet est initialisé à -1
     }
 
-    FIFO *f = creer_file(taille); //création d'une file
+    // Création d'une file
+    FIFO *f = creer_file(taille);
 
+    // Enfiler le sommet initial et marquer comme découvert
     enfile(f, sommet_init);
     decouvert[sommet_init] = 1;
-    /*Si un sommet voisin n'a pas été découvert, il est ajouté à la file, marqué comme découvert,
-    et son prédécesseur est mis à jour : */
-    while (!file_vide(f)) {
-        int valeur_actuelle = defile(f);
-        pArc arc = g->pSommet[valeur_actuelle]->arc;
 
+    // Boucle tant que la file n'est pas vide
+    while (!file_vide(f)) {
+        int sommet_courant = defile(f);
+        pArc arc = g->pSommet[sommet_courant]->arc;
+
+        // Parcourir tous les arcs du sommet courant
         while (arc) {
             if (!decouvert[arc->sommet]) {
                 enfile(f, arc->sommet);
                 decouvert[arc->sommet] = 1;
-                pred[arc->sommet] = valeur_actuelle;
+                pred[arc->sommet] = sommet_courant;
             }
             arc = arc->arc_suivant;
         }
     }
 
+    // Affichage des chemins depuis sommet_init jusqu'aux autres sommets
     for (int i = 0; i < taille; i++) {
-        if (i != sommet_init && decouvert[i]) { // boucle pour remonter la chaine de tous les prédecesseurs du sommet_init jusqu-au sommet actuel
+        if (i != sommet_init && decouvert[i]) {
+            printf("Chemin jusqu'à %s: ", g->pSommet[i]->nom);
             int j = i;
+            // Remontée de la chaîne des prédécesseurs
             while (pred[j] != -1) {
-                printf(" <- %d", pred[j] );
+                printf("%s <- ", g->pSommet[j]->nom);
                 j = pred[j];
             }
-            printf("\n");
+            printf("%s\n", g->pSommet[sommet_init]->nom);
         }
     }
 
+    // Libération de la mémoire allouée à la file
+    free(f->elements);
+    free(f);
 }
 

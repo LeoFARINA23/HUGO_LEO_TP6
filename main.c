@@ -60,7 +60,7 @@ Graphe* lire_graphe(char* nomFichier) {
 
     Graphe* graphe = CreerGraphe(ordre);
 
-    ordre = graphe->ordre;
+    graphe->ordre = ordre;
 
 
     // Lire les noms des sommets
@@ -111,9 +111,6 @@ int main() {
 
     g = lire_graphe(nom_fichier);
 
-
-
     graphe_afficher(g);
-
     return 0;
 }
